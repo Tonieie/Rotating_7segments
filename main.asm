@@ -62,15 +62,16 @@ setup :
 
 reset :
 	ldi head,10					//set head start from 0
-	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
+	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
 halt:
 	call delay_5ms
 	call check_toggle
-	brcs jump_to_init 
+	brcs jump_to_loop
 	rjmp halt
 
-jump_to_init :
+jump_to_loop :
 	lds r20,mode_addr
+
 	sbrs r20,SWROR
 	rjmp ror_loop
 	sbrs r20,SWROL
@@ -81,12 +82,14 @@ jump_to_init :
 check_toggle :
 	in current_input,SWPIN
 	andi current_input,0x0F
+
 	lds r20,last_input_addr
 	cp current_input,r20
 	brne set_mode
 	sts last_input_addr,current_input
 	clc
 	ret
+
 	set_mode :
 		cpi current_input,0x0F
 		brne store_mode
@@ -101,7 +104,7 @@ check_toggle :
 
 
 rol_loop :	
-		ldi loop_counter,50		//set it to 50 again
+		ldi loop_counter,25		//set it to 50 again
 		inc head				// increae the head by 1
 		cpi head,14				// if head is above 9 ( head == 10) reset it to 0
 		breq rol_reset_head	
@@ -111,7 +114,7 @@ rol_loop :
 			rjmp rotate_loop
 
 ror_loop :	
-		ldi loop_counter,50		//set it to 50 again
+		ldi loop_counter,25		//set it to 50 again
 		dec head				// increae the head by 1
 		cpi head,0xFF				// if head is above 9 ( head == 10) reset it to 0
 		breq ror_reset_head	
@@ -138,6 +141,8 @@ next_num :
 rotate_loop :
 	
 	mov ZL,head			//copy head to r16
+	
+	call check_toggle
 
 	sbi DIGITPORT,DIGIT1
 	call next_num
@@ -173,7 +178,14 @@ rotate_loop :
 	dec loop_counter		//decrease the loop counter
 	brne rotate_loop			//if loop_counter != 0 loop again
 
-	rjmp ror_loop		//if loop_counter == 0 start next loop
+	lds r20,mode_addr
+	sbrs r20,SWROR
+	rjmp ror_loop
+	sbrs r20,SWROL
+	rjmp rol_loop
+	sbrs r20,SWRESET
+	rjmp reset
+
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
