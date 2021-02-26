@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm Fri Feb 26 18:26:50 2021
+AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm Fri Feb 26 20:39:56 2021
 
 
 EQU  SIGNATURE_000 0000001e
@@ -695,31 +695,37 @@ EQU  ACIaddr      0000002e
 EQU  TWIaddr      00000030
 EQU  SPMRaddr     00000032
 EQU  INT_VECTORS_SIZE 00000034
-EQU  digitDDR     0000000a
-EQU  digitPort    0000000b
-EQU  digit_1      00000005
-EQU  digit_2      00000004
-EQU  digit_3      00000003
-EQU  digit_4      00000002
-EQU  BcdDDR       00000004
-EQU  BcdPort      00000005
-EQU  Bcd_A        00000000
-EQU  Bcd_B        00000001
-EQU  Bcd_C        00000002
-EQU  Bcd_D        00000003
-EQU  SwDDR        00000007
-EQU  SwPort       00000008
-EQU  SwPin        00000006
-EQU  Sw_ror       00000003
-EQU  Sw_rol       00000002
-EQU  Sw_pause     00000001
-EQU  Sw_reset     00000000
+EQU  DIGITDDR     0000000a
+EQU  DIGITPORT    0000000b
+EQU  DIGIT1       00000005
+EQU  DIGIT2       00000004
+EQU  DIGIT3       00000003
+EQU  DIGIT4       00000002
+EQU  BCDDDR       00000004
+EQU  BCDPORT      00000005
+EQU  BCDA         00000000
+EQU  BCDB         00000001
+EQU  BCDC         00000002
+EQU  BCDD         00000003
+EQU  SWDDR        00000007
+EQU  SWPORT       00000008
+EQU  SWPIN        00000006
+EQU  SWROR        00000003
+EQU  SWROL        00000002
+EQU  SWPAUSE      00000001
+EQU  SWRESET      00000000
+DEF  head         r18
+DEF  loop_counter r17
 CSEG setup        00000000
-CSEG rol_init     0000000b
-CSEG l1           0000000c
-CSEG delay_5ms    00000039
-CSEG l2           00000015
-CSEG l3           00000024
-CSEG here         00000038
-CSEG outer_loop   0000003a
-CSEG inner_loop   0000003b
+CSEG ror_init     0000000b
+CSEG ror_l1       0000000c
+CSEG delay_5ms    00000065
+CSEG ror_l2       00000015
+CSEG ror_l3       00000024
+CSEG ror_loop     00000041
+CSEG ror_next_loop 0000003b
+CSEG ror_reset_head 00000040
+CSEG ror_next_digit 0000005f
+CSEG ror_end      00000063
+CSEG outer_loop   00000066
+CSEG inner_loop   00000067
