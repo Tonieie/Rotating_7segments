@@ -160,7 +160,6 @@ rol_init :
 			ret
 			rol_not_end :
 				ldi r16,0x00
-				nop
 				ret
 ;rsw_jump :
 ;	rjmp sw_jump
