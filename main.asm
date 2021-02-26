@@ -29,6 +29,7 @@
 .equ SWRESET		= 0
 
 .def head = r18
+.def loop_counter = r17
 
 .org 0x00
 setup :
@@ -47,16 +48,16 @@ setup :
 	out SWPORT,r16
 
 rol_init :
-	ldi r17,200
+	ldi loop_counter,200
 	l1:	ldi r16,0x00
 		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT_4
+		sbi DIGITPORT,DIGIT4
 		call delay_5ms
-		cbi	DIGITPORT,DIGIT_4
-		dec r17
+		cbi	DIGITPORT,DIGIT4
+		dec loop_counter
 		brne l1
 
-	ldi r17,100
+	ldi loop_counter,100
 	l2:	ldi r16,0x01
 		out BCDPORT,r16
 		sbi DIGITPORT,DIGIT4
@@ -68,10 +69,10 @@ rol_init :
 		sbi DIGITPORT,DIGIT3
 		call delay_5ms
 		cbi	DIGITPORT,DIGIT3
-		dec r17
+		dec loop_counter
 		brne l2
 
-	ldi r17,67
+	ldi loop_counter,67
 	l3:	ldi r16,0x02
 		out BCDPORT,r16
 		sbi DIGITPORT,DIGIT4
@@ -90,18 +91,67 @@ rol_init :
 		call delay_5ms
 		cbi	DIGITPORT,DIGIT2
 
-		dec r17
+		dec loop_counter
 		brne l3
+
 	ldi head,0
+	ldi loop_counter,50
 	rjmp rol_loop
 
-	rol_next_loop :	ldi r17,50
-					inc head
+	rol_next_loop :	
+		ldi loop_counter,50
+		inc head
+		cpi head,10
+		breq rol_reset_head
+		rjmp rol_loop
+		rol_reset_head :
+			ldi head,0
+						
 		rol_loop :
 			
 			mov r16,head
+
 			out BCDPORT,r16
-			sbi DIGITPORT
+			sbi DIGITPORT,DIGIT1
+			call delay_5ms
+			cbi DIGITPORT,DIGIT1
+			
+			inc r16
+			call rol_check_end
+
+			out BCDPORT,r16
+			sbi DIGITPORT,DIGIT2
+			call delay_5ms
+			cbi DIGITPORT,DIGIT2
+			
+			inc r16
+			call rol_check_end
+
+			out BCDPORT,r16
+			sbi DIGITPORT,DIGIT3
+			call delay_5ms
+			cbi DIGITPORT,DIGIT3
+			
+			inc r16
+			call rol_check_end
+
+			out BCDPORT,r16
+			sbi DIGITPORT,DIGIT4
+			call delay_5ms
+			cbi DIGITPORT,DIGIT4
+			
+			dec loop_counter
+			brne rol_loop
+
+			rjmp rol_next_loop
+
+		rol_check_end :
+			cpi r16,10
+			breq rol_not_end
+			ret
+			rol_not_end :
+				ldi r16,0x00
+				ret
 		
 
 delay_5ms :	ldi r20,80

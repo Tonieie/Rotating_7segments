@@ -22,14 +22,18 @@
   <FILE>Rotating_7segments.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <setup><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>32</LINE></setup>
-  <rol_init><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>47</LINE></rol_init>
-  <l1><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>49</LINE></l1>
-  <delay_5ms><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>97</LINE></delay_5ms>
-  <l2><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>58</LINE></l2>
-  <l3><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>73</LINE></l3>
-  <here><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>94</LINE></here>
-  <outer_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>98</LINE></outer_loop>
-  <inner_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>99</LINE></inner_loop>
+  <setup><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>35</LINE></setup>
+  <rol_init><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>50</LINE></rol_init>
+  <l1><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>52</LINE></l1>
+  <delay_5ms><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>157</LINE></delay_5ms>
+  <l2><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>61</LINE></l2>
+  <l3><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>76</LINE></l3>
+  <rol_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>110</LINE></rol_loop>
+  <rol_next_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>101</LINE></rol_next_loop>
+  <rol_reset_head><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>107</LINE></rol_reset_head>
+  <rol_check_end><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>148</LINE></rol_check_end>
+  <rol_not_end><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>152</LINE></rol_not_end>
+  <outer_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>158</LINE></outer_loop>
+  <inner_loop><FILE>E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm</FILE><LINE>159</LINE></inner_loop>
  </LABELS>
 </ASSEMBLER_INFO>
