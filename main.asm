@@ -35,6 +35,9 @@
 .def loop_counter = r17
 .def input_temp = r19
 
+.org 0x500
+my_num : .db 0,1,2,3,4,5,6,7,8,9,10,11,12,13
+
 .org 0x00
 setup :
 	ldi r16,HIGH(RAMEND)
@@ -54,172 +57,95 @@ setup :
 	ldi r16,0x0F
 	sts last_input_addr,r16			//assume switches haven't presssed
 
+	ldi ZH,HIGH(my_num << 1)
+	rjmp ror_init
+
 rol_init :
-	ldi loop_counter,200		//loop for 5ms *  200 = 1s
-	rol_l1:	ldi r16,0x00			//show _ _ _ 1
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT4
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT4
-		dec loop_counter
-		brne rol_l1
-
-	ldi loop_counter,100		//loop for 10ms * 100 = 1s
-	rol_l2:	ldi r16,0x01			//show _ _ 1 2
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT4
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT4
-
-		ldi r16,0x00
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT3
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT3
-		dec loop_counter
-		brne rol_l2
-
-	ldi loop_counter,67			//loop for 15ms * 67  = 1s
-	rol_l3:	ldi r16,0x02			//show _ 1 2 3
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT4
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT4
-
-		ldi r16,0x01
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT3
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT3
-
-		ldi r16,0x00
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT2
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT2
-
-		dec loop_counter
-		brne rol_l3
-
-	ldi head,0					//set head start from 0
+	
+	ldi head,10					//set head start from 0
 	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
 	rjmp rotate_loop				//first time skip rol_next_loop label
 
 	rol_next_loop :	
 		ldi loop_counter,50		//set it to 50 again
 		inc head				// increae the head by 1
-		cpi head,10				// if head is above 9 ( head == 10) reset it to 0
+		cpi head,14				// if head is above 9 ( head == 10) reset it to 0
 		breq rol_reset_head	
 		rjmp rotate_loop			//else go to rol_loop label
 		rol_reset_head :
 			ldi head,0
-						
+			rjmp rotate_loop
 ror_init :
-	ldi loop_counter,200		//loop for 5ms *  200 = 1s
-	ror_l1:	ldi r16,0x09			//show 9 _ _ _
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT1
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT1
-		dec loop_counter
-		brne ror_l1
-
-	ldi loop_counter,100		//loop for 10ms * 100 = 1s
-	ror_l2:	ldi r16,0x08			//show 8 9 _ _
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT1
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT1
-
-		ldi r16,0x09
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT2
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT2
-		dec loop_counter
-		brne ror_l2
-
-	ldi loop_counter,67			//loop for 15ms * 67  = 1s
-	ror_l3:	ldi r16,0x07			//show 7 8 9 _
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT1
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT1
-
-		ldi r16,0x08
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT2
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT2
-
-		ldi r16,0x09
-		out BCDPORT,r16
-		sbi DIGITPORT,DIGIT3
-		call delay_5ms
-		cbi	DIGITPORT,DIGIT3
-
-		dec loop_counter
-		brne ror_l3
-
-	ldi head,6					//set head start from 6 (7 8 9 _ -> 6 7 8 9)
+	
+	ldi head,10					//set head start from 0
 	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
-	rjmp rotate_loop				//first time skip ror_next_loop label
+	rjmp rotate_loop				//first time skip rol_next_loop label
 
 	ror_next_loop :	
 		ldi loop_counter,50		//set it to 50 again
-		dec head				// decrease the head by 1
-		cpi head,0xFF				// if head is less than 0 ( head == 0xFF) reset it to 9
+		dec head				// increae the head by 1
+		cpi head,0xFF				// if head is above 9 ( head == 10) reset it to 0
 		breq ror_reset_head	
 		rjmp rotate_loop			//else go to rol_loop label
 		ror_reset_head :
-			ldi head,9
-						
+			ldi head,13
+			rjmp rotate_loop
+
+next_num :
+	check_tail :
+		cpi ZL,14
+		brne tail_not_reach
+		clr ZL
+	tail_not_reach:
+		lpm r16,Z+
+		cpi r16,10
+		brge clear_digit_port
+		ret
+		clear_digit_port :
+			clr r16
+			out DIGITPORT,r16
+			ret
+
+		
 rotate_loop :
 	
-	mov r16,head			//copy head to r16
+	mov ZL,head			//copy head to r16
 
-	;call check_toggle
-	;brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
+	sbi DIGITPORT,DIGIT1
+	call next_num
 
 	out BCDPORT,r16			//send output to BCDPORT by r16
-	sbi DIGITPORT,DIGIT1
 	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT1
-	
-	call next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
 
-	out BCDPORT,r16
+
 	sbi DIGITPORT,DIGIT2
-	call delay_5ms
+	call next_num
+
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT2
-	
-	call next_digit
 
-	out BCDPORT,r16
+
 	sbi DIGITPORT,DIGIT3
-	call delay_5ms
-	cbi DIGITPORT,DIGIT3
-	
-	call next_digit
+	call next_num
 
-	out BCDPORT,r16
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
+	cbi DIGITPORT,DIGIT3
+
 	sbi DIGITPORT,DIGIT4
-	call delay_5ms
+	call next_num
+
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT4
+
 	
 	dec loop_counter		//decrease the loop counter
 	brne rotate_loop			//if loop_counter != 0 loop again
 
 	rjmp ror_next_loop		//if loop_counter == 0 start next loop
-
-	next_digit :
-		inc r16
-		cpi r16,10
-		breq next_end
-		ret
-		next_end :
-			ldi r16,0x00
-			ret
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
