@@ -33,7 +33,8 @@
 
 .def head = r18
 .def loop_counter = r17
-.def input_temp = r19
+.def current_input = r19
+
 
 .org 0x00
 setup :
@@ -42,10 +43,6 @@ setup :
 	ldi r16,LOW(RAMEND)
 	out SPL,r16
 
-    ldi r16,0xFF
-	out BCDDDR,r16
-	out DIGITDDR,r16
-
 	ldi r16,0x00
 	out SWDDR,r16
 	ldi r16,0xFF
@@ -53,6 +50,60 @@ setup :
 
 	ldi r16,0x0F
 	sts last_input_addr,r16			//assume switches haven't presssed
+
+reset_output :
+	ldi r16,0xFF
+	out BCDDDR,r16
+	out DIGITDDR,r16
+
+halt:
+	call delay_5ms
+	call check_toggle
+	brcs jump_to_init 
+	rjmp halt
+
+jump_to_init :
+	lds r20,mode_addr
+
+	sbrs r20,SWROR
+	rjmp ror_init
+	sbrs r20,SWROL
+	rjmp rol_init
+
+	rjmp halt
+
+check_toggle :
+	in current_input,SWPIN
+	andi current_input,0x0F
+	lds r20,last_input_addr
+	cp current_input,r20
+	brne set_mode
+	sts last_input_addr,current_input
+	clc
+	ret
+	set_mode :
+		cpi current_input,0x0F
+		brne store_mode
+		ret
+		store_mode :
+			sts mode_addr,current_input
+			sec
+			ret
+
+mode_jump :
+	lds r20,mode_addr
+	ldi r16,(1 << SWPAUSE)
+	 
+	sbrs r20,SWROR
+	rjmp ror_next_loop
+	sbrs r20,SWROL
+	rjmp rol_next_loop
+	sbrs r20,SWRESET
+	rjmp reset_output
+	sbrs r20,SWPAUSE
+	eor r20,r16
+
+	rjmp rotate_loop
 
 rol_init :
 	ldi loop_counter,200		//loop for 5ms *  200 = 1s
@@ -97,7 +148,6 @@ rol_init :
 		sbi DIGITPORT,DIGIT2
 		call delay_5ms
 		cbi	DIGITPORT,DIGIT2
-
 		dec loop_counter
 		brne rol_l3
 
@@ -113,6 +163,7 @@ rol_init :
 		rjmp rotate_loop			//else go to rol_loop label
 		rol_reset_head :
 			ldi head,0
+			rjmp rotate_loop
 						
 ror_init :
 	ldi loop_counter,200		//loop for 5ms *  200 = 1s
@@ -173,13 +224,14 @@ ror_init :
 		rjmp rotate_loop			//else go to rol_loop label
 		ror_reset_head :
 			ldi head,9
+			rjmp rotate_loop
 						
 rotate_loop :
 	
 	mov r16,head			//copy head to r16
 
-	;call check_toggle
-	;brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
+	call check_toggle
+	brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
 
 	out BCDPORT,r16			//send output to BCDPORT by r16
 	sbi DIGITPORT,DIGIT1
@@ -207,10 +259,18 @@ rotate_loop :
 	call delay_5ms
 	cbi DIGITPORT,DIGIT4
 	
-	dec loop_counter		//decrease the loop counter
+	lds r20,mode_addr
+
+	sbrs r20,SWPAUSE
+	rjmp rotate_loop
+
+	dec loop_counter			//decrease the loop counter
 	brne rotate_loop			//if loop_counter != 0 loop again
 
-	rjmp ror_next_loop		//if loop_counter == 0 start next loop
+	sbrs r20,SWROR
+	rjmp ror_next_loop
+	sbrs r20,SWROL
+	rjmp rol_next_loop			//if loop_counter == 0 start next loop
 
 	next_digit :
 		inc r16
@@ -220,6 +280,9 @@ rotate_loop :
 		next_end :
 			ldi r16,0x00
 			ret
+
+rsw_jump :
+	rjmp mode_jump
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
