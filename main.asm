@@ -90,68 +90,62 @@ ror_init :
 		ror_reset_head :
 			ldi head,13
 			rjmp rotate_loop
-						
+
+next_num :
+	check_tail :
+		cpi ZL,14
+		brne tail_not_reach
+		clr ZL
+	tail_not_reach:
+		lpm r16,Z+
+		cpi r16,10
+		brge clear_digit_port
+		ret
+		clear_digit_port :
+			clr r16
+			out DIGITPORT,r16
+			ret
+
+		
 rotate_loop :
 	
 	mov ZL,head			//copy head to r16
 
-	lpm r16,Z+
-	cpi r16,10
-	brge delay_digit1
-
-	out BCDPORT,r16			//send output to BCDPORT by r16
 	sbi DIGITPORT,DIGIT1
-	delay_digit1 : 
-		call delay_5ms			//toggle each digit by 5ms
+	call next_num
+
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT1
-	call next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
 
-	lpm r16,Z+
-	cpi r16,10
-	brge delay_digit2
 
-	out BCDPORT,r16			//send output to BCDPORT by r16
 	sbi DIGITPORT,DIGIT2
-	delay_digit2 : 
-		call delay_5ms			//toggle each digit by 5ms
+	call next_num
+
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT2
-	call next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
 
-	lpm r16,Z+
-	cpi r16,10
-	brge delay_digit3
 
-	out BCDPORT,r16			//send output to BCDPORT by r16
 	sbi DIGITPORT,DIGIT3
-	delay_digit3 : 
-		call delay_5ms			//toggle each digit by 5ms
-	cbi DIGITPORT,DIGIT3
-	call next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
-
-	lpm r16,Z+
-	cpi r16,10
-	brge delay_digit4
+	call next_num
 
 	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
+	cbi DIGITPORT,DIGIT3
+
 	sbi DIGITPORT,DIGIT4
-	delay_digit4 : 
-		call delay_5ms			//toggle each digit by 5ms
+	call next_num
+
+	out BCDPORT,r16			//send output to BCDPORT by r16
+	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT4
-	call next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
 
 	
 	dec loop_counter		//decrease the loop counter
 	brne rotate_loop			//if loop_counter != 0 loop again
 
 	rjmp ror_next_loop		//if loop_counter == 0 start next loop
-
-	next_digit :
-		cpi ZL,14
-		breq next_end
-		ret
-		next_end :
-			ldi ZL,0x00
-			ret
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
