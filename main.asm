@@ -30,6 +30,7 @@
 
 .equ last_input_addr	= 0x0100
 .equ mode_addr			= 0x0101
+.equ last_mode_addr		= 0x0102
 
 .def head = r18
 .def loop_counter = r17
@@ -86,24 +87,11 @@ check_toggle :
 		brne store_mode
 		ret
 		store_mode :
-			sts mode_addr,current_input
+			lds r20,mode_addr
+			sts last_mode_addr,r20		//store current_mode to last_mode
+			sts mode_addr,current_input	//store new current_mode to current_mode
 			sec
 			ret
-
-mode_jump :
-	lds r20,mode_addr
-	ldi r16,(1 << SWPAUSE)
-	 
-	sbrs r20,SWROR
-	rjmp ror_next_loop
-	sbrs r20,SWROL
-	rjmp rol_next_loop
-	sbrs r20,SWRESET
-	rjmp reset_output
-	sbrs r20,SWPAUSE
-	eor r20,r16
-
-	rjmp rotate_loop
 
 rol_init :
 	ldi loop_counter,200		//loop for 5ms *  200 = 1s
@@ -231,7 +219,6 @@ rotate_loop :
 	mov r16,head			//copy head to r16
 
 	call check_toggle
-	brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
 
 	out BCDPORT,r16			//send output to BCDPORT by r16
 	sbi DIGITPORT,DIGIT1
@@ -261,6 +248,10 @@ rotate_loop :
 	
 	lds r20,mode_addr
 
+
+	sbrs r20,SWRESET
+	rjmp reset_output
+
 	sbrs r20,SWPAUSE
 	rjmp rotate_loop
 
@@ -280,9 +271,6 @@ rotate_loop :
 		next_end :
 			ldi r16,0x00
 			ret
-
-rsw_jump :
-	rjmp mode_jump
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
