@@ -104,14 +104,14 @@ rol_init :
 
 	ldi head,0					//set head start from 0
 	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
-	rjmp rol_loop				//first time skip rol_next_loop label
+	rjmp rotate_loop				//first time skip rol_next_loop label
 
 	rol_next_loop :	
 		ldi loop_counter,50		//set it to 50 again
 		inc head				// increae the head by 1
 		cpi head,10				// if head is above 9 ( head == 10) reset it to 0
 		breq rol_reset_head	
-		rjmp rol_loop			//else go to rol_loop label
+		rjmp rotate_loop			//else go to rol_loop label
 		rol_reset_head :
 			ldi head,0
 						
