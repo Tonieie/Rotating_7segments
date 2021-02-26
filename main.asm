@@ -115,56 +115,6 @@ rol_init :
 		rol_reset_head :
 			ldi head,0
 						
-		rol_loop :
-			
-			mov r16,head			//copy head to r16
-
-			;call check_toggle
-			;brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
-
-			out BCDPORT,r16			//send output to BCDPORT by r16
-			sbi DIGITPORT,DIGIT1
-			call delay_5ms			//toggle each digit by 5ms
-			cbi DIGITPORT,DIGIT1
-			
-			call rol_next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
-
-			out BCDPORT,r16
-			sbi DIGITPORT,DIGIT2
-			call delay_5ms
-			cbi DIGITPORT,DIGIT2
-			
-			call rol_next_digit
-
-			out BCDPORT,r16
-			sbi DIGITPORT,DIGIT3
-			call delay_5ms
-			cbi DIGITPORT,DIGIT3
-			
-			call rol_next_digit
-
-			out BCDPORT,r16
-			sbi DIGITPORT,DIGIT4
-			call delay_5ms
-			cbi DIGITPORT,DIGIT4
-			
-			dec loop_counter		//decrease the loop counter
-			brne rol_loop			//if loop_counter != 0 loop again
-
-			rjmp rol_next_loop		//if loop_counter == 0 start next loop
-
-		rol_next_digit :
-			inc r16
-			cpi r16,10
-			breq rol_not_end
-			ret
-			rol_not_end :
-				ldi r16,0x00
-				ret
-;rsw_jump :
-;	rjmp sw_jump
-		
-
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
 	inner_loop :
