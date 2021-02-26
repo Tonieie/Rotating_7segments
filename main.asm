@@ -56,16 +56,16 @@ setup :
 
 rol_init :
 	ldi loop_counter,200		//loop for 5ms *  200 = 1s
-	l1:	ldi r16,0x00			//show _ _ _ 1
+	rol_l1:	ldi r16,0x00			//show _ _ _ 1
 		out BCDPORT,r16
 		sbi DIGITPORT,DIGIT4
 		call delay_5ms
 		cbi	DIGITPORT,DIGIT4
 		dec loop_counter
-		brne l1
+		brne rol_l1
 
 	ldi loop_counter,100		//loop for 10ms * 100 = 1s
-	l2:	ldi r16,0x01			//show _ _ 1 2
+	rol_l2:	ldi r16,0x01			//show _ _ 1 2
 		out BCDPORT,r16
 		sbi DIGITPORT,DIGIT4
 		call delay_5ms
@@ -77,10 +77,10 @@ rol_init :
 		call delay_5ms
 		cbi	DIGITPORT,DIGIT3
 		dec loop_counter
-		brne l2
+		brne rol_l2
 
 	ldi loop_counter,67			//loop for 15ms * 67  = 1s
-	l3:	ldi r16,0x02			//show _ 1 2 3
+	rol_l3:	ldi r16,0x02			//show _ 1 2 3
 		out BCDPORT,r16
 		sbi DIGITPORT,DIGIT4
 		call delay_5ms
@@ -99,7 +99,7 @@ rol_init :
 		cbi	DIGITPORT,DIGIT2
 
 		dec loop_counter
-		brne l3
+		brne rol_l3
 
 	ldi head,0					//set head start from 0
 	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
