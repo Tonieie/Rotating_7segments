@@ -46,6 +46,64 @@ setup :
 	ldi r16,0xFF
 	out SWPORT,r16
 
+rol_init :
+	ldi r17,200
+	l1:	ldi r16,0x00
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT_4
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT_4
+		dec r17
+		brne l1
+
+	ldi r17,100
+	l2:	ldi r16,0x01
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT4
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT4
+
+		ldi r16,0x00
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT3
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT3
+		dec r17
+		brne l2
+
+	ldi r17,67
+	l3:	ldi r16,0x02
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT4
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT4
+
+		ldi r16,0x01
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT3
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT3
+
+		ldi r16,0x00
+		out BCDPORT,r16
+		sbi DIGITPORT,DIGIT2
+		call delay_5ms
+		cbi	DIGITPORT,DIGIT2
+
+		dec r17
+		brne l3
+	ldi head,0
+	rjmp rol_loop
+
+	rol_next_loop :	ldi r17,50
+					inc head
+		rol_loop :
+			
+			mov r16,head
+			out BCDPORT,r16
+			sbi DIGITPORT
+		
+
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
 	inner_loop :
