@@ -58,15 +58,15 @@ setup :
 	sts last_input_addr,r16			//assume switches haven't presssed
 
 	ldi ZH,HIGH(my_num << 1)
-	rjmp ror_init
 
-rol_init :
-	
 	ldi head,10					//set head start from 0
 	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
-	rjmp rotate_loop				//first time skip rol_next_loop label
+	rjmp rotate_loop	
 
-	rol_next_loop :	
+	rjmp ror_loop
+
+
+rol_loop :	
 		ldi loop_counter,50		//set it to 50 again
 		inc head				// increae the head by 1
 		cpi head,14				// if head is above 9 ( head == 10) reset it to 0
@@ -75,13 +75,8 @@ rol_init :
 		rol_reset_head :
 			ldi head,0
 			rjmp rotate_loop
-ror_init :
-	
-	ldi head,10					//set head start from 0
-	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
-	rjmp rotate_loop				//first time skip rol_next_loop label
 
-	ror_next_loop :	
+ror_loop :	
 		ldi loop_counter,50		//set it to 50 again
 		dec head				// increae the head by 1
 		cpi head,0xFF				// if head is above 9 ( head == 10) reset it to 0
@@ -106,7 +101,6 @@ next_num :
 			out DIGITPORT,r16
 			ret
 
-		
 rotate_loop :
 	
 	mov ZL,head			//copy head to r16
@@ -145,7 +139,7 @@ rotate_loop :
 	dec loop_counter		//decrease the loop counter
 	brne rotate_loop			//if loop_counter != 0 loop again
 
-	rjmp ror_next_loop		//if loop_counter == 0 start next loop
+	rjmp ror_loop		//if loop_counter == 0 start next loop
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
