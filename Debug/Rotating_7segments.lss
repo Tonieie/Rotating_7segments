@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm Fri Feb 26 18:26:50 2021
+AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segments\main.asm Fri Feb 26 20:35:02 2021
 
 [builtin](2): Including file 'E:/Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\avrasm\inc\m328Pdef.inc'
 [builtin](2): Including file 'E:/Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.6.364\avrasm\inc\m328Pdef.inc'
@@ -992,27 +992,30 @@ AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segme
                                  ;
                                  ; Replace with your application code
                                  
-                                 .equ digitDDR	= DDRD
-                                 .equ digitPort	= PORTD
-                                 .equ digit_1	= 5
-                                 .equ digit_2	= 4
-                                 .equ digit_3	= 3
-                                 .equ digit_4	= 2
+                                 .equ DIGITDDR	= DDRD
+                                 .equ DIGITPORT	= PORTD
+                                 .equ DIGIT1	= 5
+                                 .equ DIGIT2	= 4
+                                 .equ DIGIT3	= 3
+                                 .equ DIGIT4	= 2
                                  
-                                 .equ BcdDDR		= DDRB
-                                 .equ BcdPort	= PORTB
-                                 .equ Bcd_A		= 0
-                                 .equ Bcd_B		= 1
-                                 .equ Bcd_C		= 2
-                                 .equ Bcd_D		= 3
+                                 .equ BCDDDR		= DDRB
+                                 .equ BCDPORT	= PORTB
+                                 .equ BCDA		= 0
+                                 .equ BCDB		= 1
+                                 .equ BCDC		= 2
+                                 .equ BCDD		= 3
                                  
-                                 .equ SwDDR		= DDRC
-                                 .equ SwPort		= PORTC
-                                 .equ SwPin		= PINC
-                                 .equ Sw_ror		= 3
-                                 .equ Sw_rol		= 2
-                                 .equ Sw_pause		= 1
-                                 .equ Sw_reset		= 0
+                                 .equ SWDDR		= DDRC
+                                 .equ SWPORT		= PORTC
+                                 .equ SWPIN		= PINC
+                                 .equ SWROR		= 3
+                                 .equ SWROL		= 2
+                                 .equ SWPAUSE		= 1
+                                 .equ SWRESET		= 0
+                                 
+                                 .def head = r18
+                                 .def loop_counter = r17
                                  
                                  .org 0x00
                                  setup :
@@ -1022,76 +1025,133 @@ AVRASM ver. 2.2.8  E:\Tonie\Documents\Embeded\Rotating_7segments\Rotating_7segme
 000003 bf0d                      	out SPL,r16
                                  
 000004 ef0f                          ldi r16,0xFF
-000005 b904                      	out BcdDDR,r16
-000006 b90a                      	out digitDDR,r16
+000005 b904                      	out BCDDDR,r16
+000006 b90a                      	out DIGITDDR,r16
                                  
 000007 e000                      	ldi r16,0x00
-000008 b907                      	out SwDDR,r16
+000008 b907                      	out SWDDR,r16
 000009 ef0f                      	ldi r16,0xFF
-00000a b908                      	out SwPort,r16
+00000a b908                      	out SWPORT,r16
                                  
-                                 rol_init :
-00000b ec18                      	ldi r17,200
-00000c e001                      	l1:	ldi r16,0x01
-00000d b905                      		out BcdPort,r16
-00000e 9a5a                      		sbi digitPort,digit_4
-00000f 940e 0039                 		call delay_5ms
-000011 985a                      		cbi	digitPort,digit_4
-000012 951a                      		dec r17
-000013 f7c1                      		brne l1
+                                 ror_init :
+00000b ec18                      	ldi loop_counter,200		//loop for 5ms *  200 = 1s
+00000c e009                      	ror_l1:	ldi r16,0x09			//show 9 _ _ _
+00000d b905                      		out BCDPORT,r16
+00000e 9a5d                      		sbi DIGITPORT,DIGIT1
+00000f 940e 0065                 		call delay_5ms
+000011 985d                      		cbi	DIGITPORT,DIGIT1
+000012 951a                      		dec loop_counter
+000013 f7c1                      		brne ror_l1
                                  
-000014 e614                      	ldi r17,100
-000015 e002                      	l2:	ldi r16,0x02
-000016 b905                      		out BcdPort,r16
-000017 9a5a                      		sbi digitPort,digit_4
-000018 940e 0039                 		call delay_5ms
-00001a 985a                      		cbi	digitPort,digit_4
+000014 e614                      	ldi loop_counter,100		//loop for 10ms * 100 = 1s
+000015 e008                      	ror_l2:	ldi r16,0x08			//show 8 9 _ _
+000016 b905                      		out BCDPORT,r16
+000017 9a5d                      		sbi DIGITPORT,DIGIT1
+000018 940e 0065                 		call delay_5ms
+00001a 985d                      		cbi	DIGITPORT,DIGIT1
                                  
-00001b e001                      		ldi r16,0x01
-00001c b905                      		out BcdPort,r16
-00001d 9a5b                      		sbi digitPort,digit_3
-00001e 940e 0039                 		call delay_5ms
-000020 985b                      		cbi	digitPort,digit_3
-000021 951a                      		dec r17
-000022 f791                      		brne l2
+00001b e009                      		ldi r16,0x09
+00001c b905                      		out BCDPORT,r16
+00001d 9a5c                      		sbi DIGITPORT,DIGIT2
+00001e 940e 0065                 		call delay_5ms
+000020 985c                      		cbi	DIGITPORT,DIGIT2
+000021 951a                      		dec loop_counter
+000022 f791                      		brne ror_l2
                                  
-000023 e413                      	ldi r17,67
-000024 e003                      	l3:	ldi r16,0x03
-000025 b905                      		out BcdPort,r16
-000026 9a5a                      		sbi digitPort,digit_4
-000027 940e 0039                 		call delay_5ms
-000029 985a                      		cbi	digitPort,digit_4
+000023 e413                      	ldi loop_counter,67			//loop for 15ms * 67  = 1s
+000024 e007                      	ror_l3:	ldi r16,0x07			//show 7 8 9 _
+000025 b905                      		out BCDPORT,r16
+000026 9a5d                      		sbi DIGITPORT,DIGIT1
+000027 940e 0065                 		call delay_5ms
+000029 985d                      		cbi	DIGITPORT,DIGIT1
                                  
-00002a e002                      		ldi r16,0x02
-00002b b905                      		out BcdPort,r16
-00002c 9a5b                      		sbi digitPort,digit_3
-00002d 940e 0039                 		call delay_5ms
-00002f 985b                      		cbi	digitPort,digit_3
+00002a e008                      		ldi r16,0x08
+00002b b905                      		out BCDPORT,r16
+00002c 9a5c                      		sbi DIGITPORT,DIGIT2
+00002d 940e 0065                 		call delay_5ms
+00002f 985c                      		cbi	DIGITPORT,DIGIT2
                                  
-000030 e001                      		ldi r16,0x01
-000031 b905                      		out BcdPort,r16
-000032 9a5c                      		sbi digitPort,digit_2
-000033 940e 0039                 		call delay_5ms
-000035 985c                      		cbi	digitPort,digit_2
+000030 e009                      		ldi r16,0x09
+000031 b905                      		out BCDPORT,r16
+000032 9a5b                      		sbi DIGITPORT,DIGIT3
+000033 940e 0065                 		call delay_5ms
+000035 985b                      		cbi	DIGITPORT,DIGIT3
                                  
-000036 951a                      		dec r17
-000037 f761                      		brne l3
+000036 951a                      		dec loop_counter
+000037 f761                      		brne ror_l3
                                  
-000038 cfff                      here : rjmp here
+000038 e029                      	ldi head,9					//set head start from 0
+000039 e312                      	ldi loop_counter,50			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
+00003a c006                      	rjmp ror_loop				//first time skip rol_next_loop label
                                  
+                                 	ror_next_loop :	
+00003b e312                      		ldi loop_counter,50		//set it to 50 again
+00003c 952a                      		dec head				// increae the head by 1
+00003d 3f2f                      		cpi head,0xFF				// if head is above 9 ( head == 10) reset it to 0
+00003e f009                      		breq ror_reset_head	
+00003f c001                      		rjmp ror_loop			//else go to rol_loop label
+                                 		ror_reset_head :
+000040 e029                      			ldi head,9
+                                 						
+                                 		ror_loop :
+                                 			
+000041 2f02                      			mov r16,head			//copy head to r16
                                  
-000039 e540                      delay_5ms :	ldi r20,80
-00003a ef5a                      	outer_loop : ldi r21,250	
+                                 			;call check_toggle
+                                 			;brcs rsw_jump			//if carry set : switch is pressed -> goto sw_jump
+                                 
+000042 b905                      			out BCDPORT,r16			//send output to BCDPORT by r16
+000043 9a5a                      			sbi DIGITPORT,DIGIT4
+000044 940e 0065                 			call delay_5ms			//toggle each digit by 5ms
+000046 985a                      			cbi DIGITPORT,DIGIT4
+                                 			
+000047 940e 005f                 			call ror_next_digit		//inc r16 by 1 and check if r16 == 10? if true reset to 0
+                                 
+000049 b905                      			out BCDPORT,r16
+00004a 9a5b                      			sbi DIGITPORT,DIGIT3
+00004b 940e 0065                 			call delay_5ms
+00004d 985b                      			cbi DIGITPORT,DIGIT3
+                                 			
+00004e 940e 005f                 			call ror_next_digit
+                                 
+000050 b905                      			out BCDPORT,r16
+000051 9a5c                      			sbi DIGITPORT,DIGIT2
+000052 940e 0065                 			call delay_5ms
+000054 985c                      			cbi DIGITPORT,DIGIT2
+                                 			
+000055 940e 005f                 			call ror_next_digit
+                                 
+000057 b905                      			out BCDPORT,r16
+000058 9a5d                      			sbi DIGITPORT,DIGIT1
+000059 940e 0065                 			call delay_5ms
+00005b 985d                      			cbi DIGITPORT,DIGIT1
+                                 			
+00005c 951a                      			dec loop_counter		//decrease the loop counter
+00005d f719                      			brne ror_loop			//if loop_counter != 0 loop again
+                                 
+00005e cfdc                      			rjmp ror_next_loop		//if loop_counter == 0 start next loop
+                                 
+                                 		ror_next_digit :
+00005f 950a                      			dec r16
+000060 3f0f                      			cpi r16,0xFF
+000061 f009                      			breq ror_end
+000062 9508                      			ret
+                                 			ror_end :
+000063 e009                      				ldi r16,0x09
+000064 9508                      				ret
+                                 
+000065 e540                      delay_5ms :	ldi r20,80
+000066 ef5a                      	outer_loop : ldi r21,250	
                                  	inner_loop :
                                  		
-00003b 0000                      		nop
-00003c 955a                      		dec	r21
-00003d f7e9                      		brne inner_loop
+000067 0000                      		nop
+000068 955a                      		dec	r21
+000069 f7e9                      		brne inner_loop
                                  	
-00003e 954a                      		dec r20
-00003f f7d1                      		brne outer_loop
+00006a 954a                      		dec r20
+00006b f7d1                      		brne outer_loop
                                  	
-000040 9508                      		ret
+00006c 9508                      		ret
                                  
                                  	
                                  
@@ -1114,37 +1174,37 @@ counted separately from r26..r31 here.
 "ATmega328P" register use summary:
 x  :   0 y  :   0 z  :   0 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  23 r17:   6 r18:   0 r19:   0 r20:   2 
+r13:   0 r14:   0 r15:   0 r16:  31 r17:   9 r18:   5 r19:   0 r20:   2 
 r21:   2 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   0 r31:   0 
-Registers used: 4 out of 35 (11.4%)
+Registers used: 5 out of 35 (14.3%)
 
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
 andi  :   0 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
-brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
+brcc  :   0 brcs  :   0 break :   0 breq  :   2 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   5 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :   0 bst   :   0 call  :   6 cbi   :   6 cbr   :   0 
+brne  :   6 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brvs  :   0 bset  :   0 bst   :   0 call  :  13 cbi   :  10 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 
-cpi   :   0 cpse  :   0 dec   :   5 eor   :   0 fmul  :   0 fmuls :   0 
+cpi   :   2 cpse  :   0 dec   :   8 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   0 inc   :   0 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :  16 lds   :   0 lpm   :   0 lsl   :   0 
-lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :   1 or    :   0 ori   :   0 out   :  12 pop   :   0 
-push  :   0 rcall :   0 ret   :   1 reti  :   0 rjmp  :   1 rol   :   0 
-ror   :   0 sbc   :   0 sbci  :   0 sbi   :   6 sbic  :   0 sbis  :   0 
+ld    :   0 ldd   :   0 ldi   :  21 lds   :   0 lpm   :   0 lsl   :   0 
+lsr   :   0 mov   :   1 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+neg   :   0 nop   :   1 or    :   0 ori   :   0 out   :  16 pop   :   0 
+push  :   0 rcall :   0 ret   :   3 reti  :   0 rjmp  :   3 rol   :   0 
+ror   :   0 sbc   :   0 sbci  :   0 sbi   :  10 sbic  :   0 sbis  :   0 
 sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
 sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   0 
 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 10 out of 113 (8.8%)
+Instructions used: 13 out of 113 (11.5%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000082    130      0    130   32768   0.4%
+[.cseg] 0x000000 0x0000da    218      0    218   32768   0.7%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
