@@ -57,70 +57,67 @@ setup :
 	ldi r16,0xFF
 	out SWPORT,r16
 
-	ldi r16,0x00
-	sts is_pause,r16
-
-
 	ldi r16,0x0F
 	sts last_input,r16			//assume switches haven't presssed
-
-	ldi ZH,HIGH(my_num << 1)
 
 reset :
 	ldi head,10					//set head start from 0
 	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
-	ldi r16,0
+	clr r16
 	sts is_pause,r16
+	sts mode,r16
 
 halt:
+
 	call read_input
-
+	call delay_5ms			//delay 10ms for debounce
 	call delay_5ms
-	call delay_5ms
-
 	call read_input2
+
 	call check_mode
-	brcc halt
-	rjmp rotate_loop
+	lds r16,mode
+	cpi r16,0
+	breq halt				//if mode == 0 still halt
+	rjmp rotate_loop		//else goto rotate_loop
 	 
 
-read_input :
+read_input :						//use this label before bouncing
 	in current_input,SWPIN
-	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
+	andi current_input,0x0F			//get input to r19 then mask to get only 4 LSBs
 	
 	ldi r16,0x0F
-	cpse current_input,r16
-	sts last_input,current_input
+	cpse current_input,r16			//if current input == 0x0F (switches are halting) return to loop
+	sts last_input,current_input	//else store current input to last_input for debouncing
 	ret
 
-read_input2 :
+read_input2 :						//use this label after bouncing
 	in current_input,SWPIN
-	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
+	andi current_input,0x0F			//get input to r19 then mask to get only 4 LSBs
 	
 	lds r16,last_input
-	cp r16,current_input
-	breq set_pressedFlag
-	ret
+	cp r16,current_input			//if current input is still the same as before delay then the swich is being pressed (not bounce)
+	breq set_pressedFlag			//set flag so that we can know the switch has been pressed
+	ret								//if current != last (bounce) return to loop
 	set_pressedFlag :
-		sts pressed_mode,current_input
+		sts pressed_mode,current_input		//store selected mode to pressed_mode and set pressed flag to 1
 		ldi r16,1
 		sts pressed_flag,r16
 		ret
 
 check_mode :
 	lds r16,pressed_flag
-	sbrs r16,0					//if pressed_flag not set then back to rotate_loop
+	sbrs r16,0					//if pressed_flag not set then back to loop
 	ret
 
 	in current_input,SWPIN
 	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
 
-	cpi current_input,0x0F
+	cpi current_input,0x0F		//if the switch has been released go to set_mode, else return to loop
 	breq set_mode
 	ret
 	set_mode :
 		clr r16
-		sts pressed_flag,r16
+		sts pressed_flag,r16	//set pressed_flag to 0
 		lds r16,pressed_mode
 
 		cpi r16,0b00001110
@@ -134,65 +131,59 @@ check_mode :
 		
 		clc
 		ret
-	set_reset_mode :
+	set_reset_mode :			//set mode for pressed switch. 0 : reset, 1 : ror, 2 : rol
 		ldi r16,0
 		sts mode,r16
-		sec
+		clr r16
+		sts is_pause,r16
 		ret
 	set_ror_mode :
 		ldi r16,1
 		sts mode,r16
-		sec
+		clr r16
+		sts is_pause,r16
 		ret
 	set_rol_mode :
 		ldi r16,2
 		sts mode,r16
-		sec
+		clr r16
+		sts is_pause,r16
 		ret
-	set_pause_mode :
+	set_pause_mode :			//if paused switch selected then toggle is_pause flag
 		lds r16,is_pause
-		cpi r16,0
-		breq set_pause
-		cpi r16,0xFF
-		breq clr_pause
+		ldi r20,0xFF
+		eor r16,r20
+		sts is_pause,r16
 		ret
-		set_pause :
-			ser r16
-			sts is_pause,r16
-			ret
-		clr_pause :
-			clr r16
-			sts is_pause,r16
-			ret
 
 rol_loop :	
-		ldi loop_counter,25		//set it to 50 again
+		ldi loop_counter,25		//set loop time for 0.5s (20ms * 25 = 500ms = 0.5s)
 		inc head				// increae the head by 1
-		cpi head,14				// if head is above 9 ( head == 10) reset it to 0
+		cpi head,14				// if head reached tail position then set it to start position
 		breq rol_reset_head	
-		rjmp rotate_loop			//else go to rol_loop label
+		rjmp rotate_loop		//else go to rol_loop label
 		rol_reset_head :
 			ldi head,0
 			rjmp rotate_loop
 
 ror_loop :	
-		ldi loop_counter,25		//set it to 50 again
-		dec head				// increae the head by 1
-		cpi head,0xFF				// if head is above 9 ( head == 10) reset it to 0
+		ldi loop_counter,25		//set it to 25 again
+		dec head				// decreae the head by 1
+		cpi head,0xFF			// if head reached start position then set it to tail position
 		breq ror_reset_head	
-		rjmp rotate_loop			//else go to rol_loop label
+		rjmp rotate_loop		//else go to rol_loop label
 		ror_reset_head :
 			ldi head,13
 			rjmp rotate_loop
 
 next_num :
 	check_tail :
-		cpi ZL,14
+		cpi ZL,14				//same as head
 		brne tail_not_reach
 		clr ZL
 	tail_not_reach:
 		lpm r16,Z+
-		cpi r16,10
+		cpi r16,10				//if the number is greater than 9 don't enable the digitPort
 		brge clear_digit_port
 		ret
 		clear_digit_port :
@@ -205,7 +196,7 @@ rotate_loop :
 	ldi ZH,HIGH(my_num << 1)
 	mov ZL,head			//copy head to r16
 	
-	call read_input
+	call read_input		//read input before debouncing delay
 	call check_mode
 
 	sbi DIGITPORT,DIGIT1
@@ -223,7 +214,7 @@ rotate_loop :
 	call delay_5ms			
 	cbi DIGITPORT,DIGIT2
 
-	call read_input2
+	call read_input2		//read input after 10ms delay for debouncing
 
 	sbi DIGITPORT,DIGIT3
 	call next_num
@@ -241,8 +232,8 @@ rotate_loop :
 
 	lds r16,is_pause
 	cpi r16,0xFF
-	breq rotate_loop
-	
+	breq rotate_loop		//if is_pause set then loop again without decreasing loop counter
+
 	dec loop_counter		
 	brne rotate_loop		
 
