@@ -122,7 +122,7 @@ debounce :
 		lds r16,is_pause
 		cpi r16,0
 		breq set_pause
-		cpi r16,1
+		cpi r16,0xFF
 		breq clr_pause
 		ret
 		set_pause :
