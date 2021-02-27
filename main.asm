@@ -66,6 +66,8 @@ setup :
 reset :
 	ldi head,10					//set head start from 0
 	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
+	ldi r16,0
+	sts is_pause,r16
 halt:
 	call read_input
 	call delay_5ms
@@ -209,19 +211,18 @@ rotate_loop :
 
 	call debounce
 
-	lds r16,is_pause
-	cpi r16,0xFF
-	breq rotate_loop
-	cpi r16,0
-	breq dec_counter
-	
-	dec_counter :
-		dec loop_counter		//decrease the loop counter
-		brne rotate_loop			//if loop_counter != 0 loop again
-
 	lds r16,mode
 	cpi r16,0
 	breq b4_reset
+
+	lds r16,is_pause
+	cpi r16,0xFF
+	breq rotate_loop
+	
+	dec loop_counter		//decrease the loop counter
+	brne rotate_loop			//if loop_counter != 0 loop again
+
+	lds r16,mode
 	cpi r16,1
 	breq b4_ror
 	cpi r16,2
