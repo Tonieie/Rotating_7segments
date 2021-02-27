@@ -29,8 +29,10 @@
 .equ SWRESET		= 0
 
 .equ last_input	= 0x0100
-.equ mode			= 0x0101
-.equ is_pause			= 0x0102
+.equ mode		= 0x0101
+.equ is_pause	= 0x0102
+.equ pressed_flag = 0x0103
+.equ pressed_mode = 0x0104
 
 .def head = r18
 .def loop_counter = r17
@@ -58,6 +60,7 @@ setup :
 	ldi r16,0x00
 	sts is_pause,r16
 
+
 	ldi r16,0x0F
 	sts last_input,r16			//assume switches haven't presssed
 
@@ -68,39 +71,65 @@ reset :
 	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
 	ldi r16,0
 	sts is_pause,r16
+
 halt:
 	call read_input
+
 	call delay_5ms
 	call delay_5ms
-	call debounce
-	brcs halt
+
+	call read_input2
+	call check_mode
+	brcc halt
 	rjmp rotate_loop
+	 
 
 read_input :
 	in current_input,SWPIN
-	andi current_input,0x0F
-	lds r16,last_input
-	cpse r16,current_input
+	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
+	
+	ldi r16,0x0F
+	cpse current_input,r16
 	sts last_input,current_input
 	ret
 
-debounce :
+read_input2 :
 	in current_input,SWPIN
-	andi current_input,0x0F
-
+	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
+	
 	lds r16,last_input
-	cp current_input,r16
+	cp r16,current_input
+	breq set_pressedFlag
+	ret
+	set_pressedFlag :
+		sts pressed_mode,current_input
+		ldi r16,1
+		sts pressed_flag,r16
+		ret
+
+check_mode :
+	lds r16,pressed_flag
+	sbrs r16,0					//if pressed_flag not set then back to rotate_loop
+	ret
+
+	in current_input,SWPIN
+	andi current_input,0x0F		//get input to r19 then mask to get only 4 LSBs
+
+	cpi current_input,0x0F
 	breq set_mode
-	clc
 	ret
 	set_mode :
-		cpi current_input,0b00001110
+		clr r16
+		sts pressed_flag,r16
+		lds r16,pressed_mode
+
+		cpi r16,0b00001110
 		breq set_reset_mode
-		cpi current_input,0b00000111
+		cpi r16,0b00000111
 		breq set_ror_mode
-		cpi current_input,0b00001011
+		cpi r16,0b00001011
 		breq set_rol_mode
-		cpi current_input,0b00001101
+		cpi r16,0b00001101
 		breq set_pause_mode
 		
 		clc
@@ -173,9 +202,11 @@ next_num :
 
 rotate_loop :
 	
+	ldi ZH,HIGH(my_num << 1)
 	mov ZL,head			//copy head to r16
 	
 	call read_input
+	call check_mode
 
 	sbi DIGITPORT,DIGIT1
 	call next_num
@@ -188,52 +219,44 @@ rotate_loop :
 	sbi DIGITPORT,DIGIT2
 	call next_num
 
-	out BCDPORT,r16			//send output to BCDPORT by r16
-	call delay_5ms			//toggle each digit by 5ms
+	out BCDPORT,r16			
+	call delay_5ms			
 	cbi DIGITPORT,DIGIT2
 
-	call debounce
-	call read_input
+	call read_input2
 
 	sbi DIGITPORT,DIGIT3
 	call next_num
 
-	out BCDPORT,r16			//send output to BCDPORT by r16
-	call delay_5ms			//toggle each digit by 5ms
+	out BCDPORT,r16			
+	call delay_5ms			
 	cbi DIGITPORT,DIGIT3
 
 	sbi DIGITPORT,DIGIT4
 	call next_num
 
-	out BCDPORT,r16			//send output to BCDPORT by r16
-	call delay_5ms			//toggle each digit by 5ms
+	out BCDPORT,r16			
+	call delay_5ms			
 	cbi DIGITPORT,DIGIT4
-
-	call debounce
-
-	lds r16,mode
-	cpi r16,0
-	breq b4_reset
 
 	lds r16,is_pause
 	cpi r16,0xFF
 	breq rotate_loop
 	
-	dec loop_counter		//decrease the loop counter
-	brne rotate_loop			//if loop_counter != 0 loop again
+	dec loop_counter		
+	brne rotate_loop		
 
+load_jumpTable :
 	lds r16,mode
-	cpi r16,1
-	breq b4_ror
-	cpi r16,2
-	breq b4_rol
-	rjmp rotate_loop
-	b4_reset :
-		rjmp reset
-	b4_ror :
-		rjmp ror_loop
-	b4_rol :
-		rjmp rol_loop
+	ldi ZL,LOW(mode_jumpTable)
+	ldi ZH,HIGH(mode_jumpTable)
+	add ZL,r16
+	ijmp
+
+mode_jumpTable :
+	rjmp reset
+	rjmp ror_loop
+	rjmp rol_loop
       
 delay_5ms :	ldi r20,80
 	outer_loop : ldi r21,250	
