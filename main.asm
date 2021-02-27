@@ -41,9 +41,6 @@
 .org 0x500
 my_num : .db 0,1,2,3,4,5,6,7,8,9,10,11,12,13
 
-.org 0x500
-my_num : .db 0,1,2,3,4,5,6,7,8,9,10,11,12,13
-
 .org 0x00
 setup :
 	ldi r16,HIGH(RAMEND)
@@ -237,10 +234,10 @@ rotate_loop :
 	cpi r16,0xFF
 	breq rotate_loop		//if is_pause set then loop again without decreasing loop counter
 
-	dec loop_counter		
+	dec loop_counter		//else decrease loop counter by 1
 	brne rotate_loop		
 
-load_jumpTable :
+load_jumpTable :				//if loop_counter == 0 then jump to current mode using ijmp instruction
 	lds r16,mode
 	ldi ZL,LOW(mode_jumpTable)
 	ldi ZH,HIGH(mode_jumpTable)
