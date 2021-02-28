@@ -7,7 +7,7 @@
 .equ DIGIT4	= 2
 
 .equ BCDDDR		= DDRB
-.equ BCDPORT	= PORTB
+.equ BCDPORT		= PORTB
 .equ BCDA		= 0
 .equ BCDB		= 1
 .equ BCDC		= 2
@@ -21,15 +21,15 @@
 .equ SWPAUSE		= 1
 .equ SWRESET		= 0
 
-.equ last_input	= 0x0100
+.equ last_input		= 0x0100
 .equ mode		= 0x0101
-.equ is_pause	= 0x0102
-.equ pressed_flag = 0x0103
-.equ pressed_mode = 0x0104
+.equ is_pause		= 0x0102
+.equ pressed_flag 	= 0x0103
+.equ pressed_mode 	= 0x0104
 
-.def head = r18
-.def loop_counter = r17
-.def current_input = r19
+.def loop_counter 	= r17
+.def head 		= r18
+.def current_input 	= r19
 
 .org 0x500
 my_num : .db 0,1,2,3,4,5,6,7,8,9,10,11,12,13
@@ -55,7 +55,7 @@ setup :
 
 reset :
 	ldi head,10					//set head start from 0
-	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
+	ldi loop_counter,25			//set loop time for 0.5s (20ms * 25 = 500ms = 0.5s)
 	clr r16
 	sts is_pause,r16
 	sts mode,r16
@@ -122,7 +122,6 @@ check_mode :					//call this label wherever you want. it only trigger when the p
 		cpi r16,0b00001101
 		breq set_pause_mode
 		
-		clc
 		ret
 	set_reset_mode :			//set mode for pressed switch. 0 : reset, 1 : ror, 2 : rol
 		ldi r16,0
