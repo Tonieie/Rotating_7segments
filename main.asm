@@ -190,11 +190,9 @@ rotate_loop :
 	mov ZL,head			//copy head to r16
 	
 	call read_input		//read input before debouncing delay
-	call check_mode
 
 	sbi DIGITPORT,DIGIT1    //enable digit port for each digit individually 
 	call next_num
-
 	out BCDPORT,r16			//send output to BCDPORT by r16
 	call delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT1     //disable digit port for each digit individually 
@@ -202,23 +200,21 @@ rotate_loop :
 
 	sbi DIGITPORT,DIGIT2
 	call next_num
-
 	out BCDPORT,r16			
 	call delay_5ms			
 	cbi DIGITPORT,DIGIT2
 
 	call debounce		//read input after 10ms delay for debouncing
+	call check_mode
 
 	sbi DIGITPORT,DIGIT3
 	call next_num
-
 	out BCDPORT,r16			
 	call delay_5ms			
 	cbi DIGITPORT,DIGIT3
 
 	sbi DIGITPORT,DIGIT4
 	call next_num
-
 	out BCDPORT,r16			
 	call delay_5ms			
 	cbi DIGITPORT,DIGIT4
