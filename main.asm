@@ -62,12 +62,12 @@ reset :
 
 halt:
 
-	call read_input
-	call delay_5ms			//delay 10ms for debounce
-	call delay_5ms
-	call debounce
+	rcall read_input
+	rcall delay_5ms			//delay 10ms for debounce
+	rcall delay_5ms
+	rcall debounce
 
-	call check_mode
+	rcall check_mode
 	lds r16,mode
 	cpi r16,0
 	breq halt				//if mode == 0 still halt
@@ -189,34 +189,34 @@ rotate_loop :
 	ldi ZH,HIGH(my_num << 1)
 	mov ZL,head			//copy head to r16
 	
-	call read_input		//read input before debouncing delay
+	rcall read_input		//read input before debouncing delay
 
 	sbi DIGITPORT,DIGIT1    //enable digit port for each digit individually 
-	call next_num
+	rcall next_num
 	out BCDPORT,r16			//send output to BCDPORT by r16
-	call delay_5ms			//toggle each digit by 5ms
+	rcall delay_5ms			//toggle each digit by 5ms
 	cbi DIGITPORT,DIGIT1     //disable digit port for each digit individually 
 
 
 	sbi DIGITPORT,DIGIT2
-	call next_num
+	rcall next_num
 	out BCDPORT,r16			
-	call delay_5ms			
+	rcall delay_5ms			
 	cbi DIGITPORT,DIGIT2
 
-	call debounce		//read input after 10ms delay for debouncing
+	rcall debounce		//read input after 10ms delay for debouncing
 	call check_mode
 
 	sbi DIGITPORT,DIGIT3
-	call next_num
+	rcall next_num
 	out BCDPORT,r16			
-	call delay_5ms			
+	rcall delay_5ms			
 	cbi DIGITPORT,DIGIT3
 
 	sbi DIGITPORT,DIGIT4
-	call next_num
+	rcall next_num
 	out BCDPORT,r16			
-	call delay_5ms			
+	rcall delay_5ms			
 	cbi DIGITPORT,DIGIT4
 
 	lds r16,is_pause
