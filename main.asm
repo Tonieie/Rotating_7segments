@@ -65,7 +65,7 @@ halt:
 	call read_input
 	call delay_5ms			//delay 10ms for debounce
 	call delay_5ms
-	call read_input2
+	call debounce
 
 	call check_mode
 	lds r16,mode
@@ -83,7 +83,7 @@ read_input :						//use this label before bouncing
 	sts last_input,current_input	//else store current input to last_input for debouncing
 	ret
 
-read_input2 :						//use this label after bouncing
+debounce :						//use this label after bouncing
 	in current_input,SWPIN
 	andi current_input,0x0F			//get input to r19 then mask to get only 4 LSBs
 	
@@ -151,9 +151,9 @@ check_mode :
 
 rol_loop :	
 		ldi loop_counter,25		//set loop time for 0.5s (20ms * 25 = 500ms = 0.5s)
-		inc head				// increae the head by 1
-		cpi head,14				// if head reached tail position then set it to start position
+		cpi head,13				// if head reached tail position then set it to start position
 		breq rol_reset_head	
+		inc head				// increae the head by 1
 		rjmp rotate_loop		//else go to rol_loop label
 		rol_reset_head :
 			ldi head,0
@@ -161,9 +161,9 @@ rol_loop :
 
 ror_loop :	
 		ldi loop_counter,25		//set it to 25 again
-		dec head				// decreae the head by 1
-		cpi head,0xFF			// if head reached start position then set it to tail position
+		cpi head,0			// if head reached start position then set it to tail position
 		breq ror_reset_head	
+		dec head				// decreae the head by 1
 		rjmp rotate_loop		//else go to rol_loop label
 		ror_reset_head :
 			ldi head,13
@@ -207,7 +207,7 @@ rotate_loop :
 	call delay_5ms			
 	cbi DIGITPORT,DIGIT2
 
-	call read_input2		//read input after 10ms delay for debouncing
+	call debounce		//read input after 10ms delay for debouncing
 
 	sbi DIGITPORT,DIGIT3
 	call next_num
