@@ -55,7 +55,7 @@ setup :
 
 reset :
 	ldi head,10					//set head start from 0
-	ldi loop_counter,25			// 1 loop = 5ms * 4 = 20ms, but we want to rotate every 1s so set loop_counter to 50 times = 20ms * 50 = 1s
+	ldi loop_counter,25			//set loop time for 0.5s (20ms * 25 = 500ms = 0.5s)
 	clr r16
 	sts is_pause,r16
 	sts mode,r16
@@ -122,7 +122,6 @@ check_mode :					//call this label wherever you want. it only trigger when the p
 		cpi r16,0b00001101
 		breq set_pause_mode
 		
-		clc
 		ret
 	set_reset_mode :			//set mode for pressed switch. 0 : reset, 1 : ror, 2 : rol
 		ldi r16,0
