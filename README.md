@@ -10,12 +10,12 @@
 
  ## Setup
  ### Microship Studio
- *atmega328p
+ * atmega328p
  ### Proteus
-  *7447 Digital IC for BCD to 7-segment (Active Low)
-  *Arduino Uno R3
-  *4xPush Button Switch
-  *4 Digit 7-segments (Common Anode)
-  The wiring show in figure below
+ * 7447 Digital IC for BCD to 7-segment (Active Low)
+ * Arduino Uno R3
+ * 4xPush Button Switch
+ * 4 Digit 7-segments (Common Anode)
+ The wiring show in figure below
   
   (./img/wiring.jpg)
