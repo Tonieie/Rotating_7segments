@@ -16,6 +16,6 @@
  * Arduino Uno R3
  * 4xPush Button Switch
  * 4 Digit 7-segments (Common Anode)
- The wiring show in figure below
+ The wiring shows in figure below
   
   ![Proteus Wiring](./img/wiring.JPG?raw=true)
