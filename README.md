@@ -18,4 +18,4 @@
  * 4 Digit 7-segments (Common Anode)
  The wiring show in figure below
   
-  ![Proteus Wiring](github.com/Tonieie/Rotating_7segments/blob/main/img/wiring.JPG)
+  ![Proteus Wiring](./img/wiring.JPG)
