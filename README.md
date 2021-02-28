@@ -1,6 +1,6 @@
 # Rotating_7segments
 ## About
- This project  a mini project of MICROPROCESSORS AND EMBEDDED SYSTEM (010113027) at ECE KMUTNB
+ This project  a mini project of MICROPROCESSORS AND EMBEDDED SYSTEM (010113027) at ECE KMUTNB (2/2020 Semester)
  The project is AVR Assembly based. The project demonstrates a way to rotate number 0-9 on 4 digits 7-segments using Assembly Language.
  
  ## Technology
