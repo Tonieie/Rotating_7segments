@@ -74,7 +74,7 @@ halt:
 	rjmp rotate_loop		//else goto rotate_loop
 	 
 
-read_input :						//use this label before bouncing
+read_input :						//call this label before bouncing
 	in current_input,SWPIN
 	andi current_input,0x0F			//get input to r19 then mask to get only 4 LSBs
 	
@@ -83,7 +83,7 @@ read_input :						//use this label before bouncing
 	sts last_input,current_input	//else store current input to last_input for debouncing
 	ret
 
-debounce :						//use this label after bouncing
+debounce :						//call this label after called read_input at least 10ms for debouncing
 	in current_input,SWPIN
 	andi current_input,0x0F			//get input to r19 then mask to get only 4 LSBs
 	
@@ -97,9 +97,9 @@ debounce :						//use this label after bouncing
 		sts pressed_flag,r16
 		ret
 
-check_mode :
+check_mode :					//call this label wherever you want. it only trigger when the pressed_flag is set
 	lds r16,pressed_flag
-	sbrs r16,0					//if pressed_flag not set then back to loop
+	sbrs r16,0					//if pressed_flag isn't set then back to loop
 	ret
 
 	in current_input,SWPIN
