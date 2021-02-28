@@ -10,6 +10,7 @@
 
  ## Setup
  ### Microship Studio
+ * AVR Assemblet
  * atmega328p
  ### Proteus
  * 7447 Digital IC for BCD to 7-segment (Active Low)
