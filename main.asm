@@ -1,10 +1,3 @@
-;
-; Rotating_7segments.asm
-;
-; Created: 26-Feb-21 6:22:22 PM
-; Author : Tonie
-;
-; Replace with your application code
 
 .equ DIGITDDR	= DDRD
 .equ DIGITPORT	= PORTD
@@ -199,12 +192,12 @@ rotate_loop :
 	call read_input		//read input before debouncing delay
 	call check_mode
 
-	sbi DIGITPORT,DIGIT1
+	sbi DIGITPORT,DIGIT1    //enable digit port for each digit individually 
 	call next_num
 
 	out BCDPORT,r16			//send output to BCDPORT by r16
 	call delay_5ms			//toggle each digit by 5ms
-	cbi DIGITPORT,DIGIT1
+	cbi DIGITPORT,DIGIT1     //disable digit port for each digit individually 
 
 
 	sbi DIGITPORT,DIGIT2
