@@ -18,4 +18,4 @@
  * 4 Digit 7-segments (Common Anode)
  The wiring show in figure below
   
-  (./img/wiring.jpg)
+  ![Proteus Wiring](./img/wiring.jpg)
