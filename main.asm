@@ -1,13 +1,13 @@
 
 .equ DIGITDDR	= DDRD
 .equ DIGITPORT	= PORTD
-.equ DIGIT1	= 5
-.equ DIGIT2	= 4
-.equ DIGIT3	= 3
-.equ DIGIT4	= 2
+.equ DIGIT1		= 5
+.equ DIGIT2		= 4
+.equ DIGIT3		= 3
+.equ DIGIT4		= 2
 
 .equ BCDDDR		= DDRB
-.equ BCDPORT		= PORTB
+.equ BCDPORT	= PORTB
 .equ BCDA		= 0
 .equ BCDB		= 1
 .equ BCDC		= 2
@@ -18,17 +18,17 @@
 .equ SWPIN		= PINC
 .equ SWROR		= 3
 .equ SWROL		= 2
-.equ SWPAUSE		= 1
-.equ SWRESET		= 0
+.equ SWPAUSE	= 1
+.equ SWRESET	= 0
 
 .equ last_input		= 0x0100
-.equ mode		= 0x0101
+.equ mode			= 0x0101
 .equ is_pause		= 0x0102
 .equ pressed_flag 	= 0x0103
 .equ pressed_mode 	= 0x0104
 
 .def loop_counter 	= r17
-.def head 		= r18
+.def head 			= r18
 .def current_input 	= r19
 
 .org 0x500
