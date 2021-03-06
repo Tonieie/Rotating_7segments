@@ -5,7 +5,7 @@
  
  ## Technology
  Project is created with:
- * Microship Studio version: 7.0.254
+ * Microchip Studio version: 7.0.254
  * Proteus 8 Professional
 
  ## Setup
