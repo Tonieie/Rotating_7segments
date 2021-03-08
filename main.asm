@@ -203,7 +203,7 @@ rotate_loop :
 	cbi DIGITPORT,DIGIT2
 
 	rcall debounce		//read input after 10ms delay for debouncing
-	call check_mode
+	rcall check_mode
 
 	sbi DIGITPORT,DIGIT3
 	rcall next_num
