@@ -1,10 +1,10 @@
 
 .equ DIGITDDR	= DDRD
 .equ DIGITPORT	= PORTD
-.equ DIGIT1		= 5
-.equ DIGIT2		= 4
-.equ DIGIT3		= 3
-.equ DIGIT4		= 2
+.equ DIGIT1		= 7
+.equ DIGIT2		= 6
+.equ DIGIT3		= 5
+.equ DIGIT4		= 4
 
 .equ BCDDDR		= DDRB
 .equ BCDPORT	= PORTB
@@ -39,16 +39,16 @@ setup :
 	ldi r16,HIGH(RAMEND)
 	out SPH,r16
 	ldi r16,LOW(RAMEND)
-	out SPL,r16
+	out SPL,r16					//initial stack pointer
 
     ldi r16,0xFF
 	out BCDDDR,r16
-	out DIGITDDR,r16
+	out DIGITDDR,r16			//set Digit Port as Output
 
 	ldi r16,0x00
 	out SWDDR,r16
 	ldi r16,0xFF
-	out SWPORT,r16
+	out SWPORT,r16				//set Switch Port as Input with internal Pull-Up
 
 	ldi r16,0x0F
 	sts last_input,r16			//assume switches haven't presssed
@@ -61,7 +61,6 @@ reset :
 	sts mode,r16
 
 halt:
-
 	rcall read_input
 	rcall delay_5ms			//delay 10ms for debounce
 	rcall delay_5ms
